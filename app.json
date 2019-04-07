@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "Shoppongau",
+    "privacy": "public",
+    "sdkVersion": "32.0.0",
+    "ios": {
+      "bundleIdentifier": "com.shopspot.shoppongau",
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.shopspot.shoppongau",
+      "config": {
+        "googleMaps": { "apiKey": "AIzaSyCLFgAu3tW465rK7yhaZI3QoJwRyP48rqU" }   
+     }
+    },
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
