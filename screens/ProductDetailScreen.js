@@ -1,10 +1,10 @@
 import React ,{Component} from 'react';
-import {Dimensions,Image, ScrollView, StyleSheet, Text, View,ActivityIndicator} from 'react-native';
+import {Dimensions,Image, ScrollView, StyleSheet, Text, View,ActivityIndicator,AsyncStorage} from 'react-native';
 import {Body, Thumbnail, Card, CardItem, Left, Right, Icon, Button } from 'native-base';
 import Bubble from '../api/Bubble';
 import Price from '../components/Price';
 import { MapView } from 'expo';
-
+import FavoriteButton from '../components/FavoriteButton';
 
 export default class ProductDetailScreen extends Component {  
   
@@ -19,6 +19,7 @@ export default class ProductDetailScreen extends Component {
       product:null,
       isLoading: true,
       address:{},
+      favorite:null
     };
   }
 
@@ -45,18 +46,56 @@ _getProductInfo(){
 _getShop = async()=>{
     response = await Bubble._getShopByDealerId(this.state.dealerId);
     shop = response.response.shop;
-    console.log(shop);
     this.setState({shop, address: shop.Address});
     uri = 'https:' + shop.Logo;
     this.setState({logo: uri}); 
-    let isLoading = false;
-    this.setState({isLoading});
 }
+
+_addFavorite = async () => {
+  if(!this.state.favorite){
+    console.log('like');
+    try {
+      await AsyncStorage.setItem('favoriteItem', JSON.stringify(this.state.product._id));
+      await this._getFavorite();
+    } catch (error) {
+      alert(error)
+    } 
+  }else if(this.state.favorite){
+    console.log('unlike');
+    try {
+      console.log(this.state.product._id)
+      await AsyncStorage.removeItem('favoriteItem', JSON.stringify(this.state.product._id));
+      await this._getFavorite();
+    } catch (error) {
+      alert(error)
+    } 
+  }
+}
+
+_getFavorite = async () => {
+  try {
+  favorite = await AsyncStorage.getItem('favoriteItem') || 'none';
+  console.log(favorite);
+  console.log(JSON.stringify(this.state.product._id));
+  if (favorite !== null && favorite === JSON.stringify(this.state.product._id)) {
+    console.log(true);
+    this.setState({favorite:true});
+  }
+  else{
+    this.setState({favorite:false});
+  }
+  } catch (error) {
+      // Error retrieving data
+  }
+  let isLoading = false;
+  this.setState({isLoading});
+};
 
 componentDidMount(){
   this._isMounted = true;
   if(this._isMounted){
     this._getProductInfo();
+    this._getFavorite();
   }
   
 } 
@@ -84,7 +123,7 @@ render() {
                 <Text style={{fontSize:20, fontWeight:'500', color:'#3D3D3D'}}>{this.state.product.title}</Text>
               </Left>
               <Right style={{alignSelf:'flex-start'}}>
-                <Price size={19} product={this.state.product}></Price>
+                <Price size={19} marginRight={5} product={this.state.product}></Price>
               </Right>
             </CardItem> 
             <CardItem>
@@ -101,25 +140,27 @@ render() {
                     </Body>
                 </Left> 
                 <Right>
-                  <Button style={{width:65, justifyContent:'space-between'}} iconLeft transparent>
-                    <Icon style={{color:'grey'}} name='heart' />
-                    <Text>Merken</Text>
-                  </Button>
+                  <FavoriteButton 
+                  favorite={this.state.favorite} 
+                  onPress={()=> this._addFavorite()}>
+                  </FavoriteButton>
                 </Right>
            </CardItem>
            <View style={{marginTop:20}}>
            <MapView
-        style={{
-          height:300,
+        style={{ 
+          height:200,
           width:'90%',
           alignSelf: 'center'
         }}
         initialRegion={{
           latitude: this.state.address.lat,
           longitude: this.state.address.lng,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421,
+          latitudeDelta: 0.001,
+          longitudeDelta: 0.001,
+          scrollEnabled: false  
         }}>
+       
          <MapView.Marker
           coordinate={{
             "latitude":this.state.address.lat,
@@ -143,12 +184,11 @@ render() {
 
 //image width 
 const dimensions = Dimensions.get('window');
-const imageWidth = dimensions.width;
+const imageWidth = dimensions.width; 
 
 const styles = StyleSheet.create({ 
     container: {
       backgroundColor: '#fff',
-
     }, 
     image:{
       height: 300,

@@ -34,7 +34,7 @@ static _postData = async (title, image)=>{
 
 static _getProducts = async ()=>{
   let responseJson
-    await fetch('https://shoppongau.bubbleapps.io/version-test/api/1.1/wf/getproducts/',{
+    await fetch("https://shoppongau.bubbleapps.io/version-test/api/1.1/wf/getproducts/",{
     method: 'POST',
     body: JSON.stringify({sort: false}),
     headers:{ 
@@ -112,7 +112,7 @@ static _getDate(){
 
 static _storeData = async (token) => {
     try {
-      await AsyncStorage.setItem('token', token);
+      await AsyncStorage.setItem('token', JSON.stringify(token));
     } catch (error) {
       // Error saving data
     }

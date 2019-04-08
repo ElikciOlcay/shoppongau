@@ -1,6 +1,6 @@
 import React ,{Component} from 'react';
-import {Image, StyleSheet,View,TouchableOpacity} from 'react-native';
-import { Card, CardItem, Text, Body, Left, Right, Thumbnail} from 'native-base';
+import {Image, StyleSheet,View,TouchableOpacity,ActivityIndicator} from 'react-native';
+import { Card, CardItem, Text, Body, Left, Thumbnail} from 'native-base';
 import Bubble from '../api/Bubble';
 import Price from '../components/Price';
 
@@ -9,7 +9,8 @@ export default class ProductItem extends Component{
     state = {
         dealerId: this.props.product["Created By"],
         shop:{}, 
-        logo:null,
+        logo:'',
+        isLoading: true
     };
 
  
@@ -23,7 +24,7 @@ export default class ProductItem extends Component{
 
     _createLogoUri(){
         uri = 'https:' + this.state.shop.Logo;
-        this.setState({logo: uri});
+        this.setState({logo: uri, isLoading:false});
     }  
       
     componentDidMount(){
@@ -31,15 +32,16 @@ export default class ProductItem extends Component{
     }
 
     render(){
-
         const{product, onPress} = this.props;
         const{shop} = this.state;
-        
-        
-
-        return(
+        if(this.state.isLoading){
+           return(
+            <View></View>  
+           )
+        }
+        return(  
             <TouchableOpacity onPress={onPress}> 
-                <Card transparent style={styles.card}>
+                 <Card transparent style={styles.card}>
                     <CardItem>
                         <Left>
                             <Thumbnail style={{height:35, width:35}} source={{uri: this.state.logo}} />
@@ -54,14 +56,14 @@ export default class ProductItem extends Component{
                     </CardItem> 
                     <CardItem footer style={{flexDirection:'column', alignItems:'flex-start', justifyContent:'space-between'}}>
                         <Text style={{color: '#686868'}}>{product.title}</Text>
-                        <Price size={16} product={product}></Price>
+                        <Price size={16} marginRight={0} product={product}></Price>
                     </CardItem>
                 </Card>
-            </TouchableOpacity>
-             
-        );  
+            </TouchableOpacity> 
+            );
+        }  
     }
-    }
+    
   
 
 
@@ -69,9 +71,9 @@ export default class ProductItem extends Component{
 const styles = StyleSheet.create({
     card: {
         width: 180,
-        marginLeft:5,
-        marginRight:5 
-}, 
+        marginLeft: 5,
+        marginRight:5
+},  
     
     
 }); 

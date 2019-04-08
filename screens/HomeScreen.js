@@ -21,9 +21,6 @@ _fetchProduct = async ()=>{
   this.setState({products: responseJson.response.products, isLoading:false});
 }
 
-
-
-
 _refresh = ()=> {
     this.setState({isLoading:true});
     this._fetchProduct();
@@ -48,18 +45,15 @@ componentDidMount(){
         };
       return (
         <Container style={styles.container}> 
-          <Header searchBar rounded style={{marginBottom: 20, height:120, backgroundColor:'#50A1AA', flexDirection: 'column'}}>
-            <Body>
-              <Title style={{alignSelf:'center', fontSize: 25, paddingTop: 20, fontWeight: 'bold'}}>Shoppongau</Title>
-            </Body> 
-            <Item style={{position: 'absolute', top:70, width: '95%', height: 40}}>
+          <Header searchBar rounded style={styles.header}>
+            <Item style={styles.headerItem}>
               <Icon name="ios-search" />
-            <Input placeholder="Shoppongau durchsuchen" placeholderTextColor='#CCCCCC' style={{fontSize:18}} /> 
+            <Input placeholder="Shoppongau durchsuchen" placeholderTextColor='gray' style={{fontSize:16}} /> 
           </Item>
-          </Header>
+          </Header> 
           
-          <Content contentContainerStyle={styles.content}> 
-            <FlatList
+          <Content> 
+            <FlatList contentContainerStyle={styles.content}
                 data={this.state.products}
                 // Key für die list. Momentan name 
                 keyExtractor = {item => item._id}  
@@ -67,7 +61,7 @@ componentDidMount(){
                 numColumns={2}
                 showsVerticalScrollIndicator={false}
                 renderItem={({item}) => (
-              <ProductItem 
+              <ProductItem style={{marginRight:10}}
                 onPress={()=> this.props.navigation.navigate('Detail', {product: item})} product={item}>
               </ProductItem>
                 )}
@@ -91,26 +85,23 @@ componentDidMount(){
               marginTop: StatusBar.currentHeight
           }
       }),
-
     },
     content: {
       flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center'
-      
+      justifyContent: 'space-around',
+      alignItems: 'center',
+      marginTop: 10
     },
-    
     listEmpty:{
         fontSize: 18,
         paddingTop: 100,
         textAlign: 'center'
     },
-
     card:{
       width: 180,
       height: 300,
-      marginLeft:5,
-      marginRight:5 
+      marginLeft:10,
+      marginRight:10 
     },
     loading: {
       position: 'absolute',
@@ -120,6 +111,18 @@ componentDidMount(){
       bottom: 0,
       alignItems: 'center',
       justifyContent: 'center'
-    }
+    },
+    headerItem:{
+      position:'absolute',
+      height:40,
+      top: Platform.OS === 'ios' ? 30 : 10,
+      width: '95%', 
+      backgroundColor:'#F0EFEF'
+    },
+    header:{
+      height:Platform.OS === 'ios' ? 80 : 60,
+      flexDirection: 'column', 
+      backgroundColor:'white', 
+      alignItems:'center'}
     
   });
