@@ -32,6 +32,7 @@ static _postData = async (title, image)=>{
       .catch(error => console.error('Error:', error));
 }
 
+//get all products for the Startpage
 static _getProducts = async ()=>{
   let responseJson
     await fetch("https://shoppongau.bubbleapps.io/version-test/api/1.1/wf/getproducts/",{
@@ -46,6 +47,37 @@ static _getProducts = async ()=>{
   return responseJson;
 }
 
+//get all products from shop
+static _getProductsFromShop = async (shopId)=>{
+  let responseJson
+    await fetch("https://shoppongau.bubbleapps.io/version-test/api/1.1/wf/getshopproducts/",{
+    method: 'POST',
+    body: JSON.stringify({sort: false, shopId:shopId}),
+    headers:{ 
+      'Content-Type': 'application/json',
+    }
+  }).then(res => res.json())
+  .then(response => responseJson = response)
+  .catch(error => console.log('Error', error));
+  return responseJson;
+}
+
+//Get all shops for the ShoppsScreen
+static _getShops = async ()=>{
+  let responseJson
+    await fetch("https://shoppongau.bubbleapps.io/version-test/api/1.1/wf/getshops/",{
+    method: 'POST',
+    body: JSON.stringify({sort: false}),
+    headers:{ 
+      'Content-Type': 'application/json',
+    }
+  }).then(res => res.json())
+  .then(response => responseJson = response)
+  .catch(error => console.log('Error', error));
+  return responseJson;
+}
+
+//get shop for productDetailsScreen
 static _getShopByDealerId = async (dealerId)=>{
     let responseJson
     await fetch('https://shoppongau.bubbleapps.io/version-test/api/1.1/wf/getshop/',{
@@ -124,9 +156,7 @@ static _retrieveData = async () => {
     console.log(this.token);
     if (token !== null) {
     // We have data!!
-    
-    
-}
+  }
     } catch (error) {
         // Error retrieving data
     }

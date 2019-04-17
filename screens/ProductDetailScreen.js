@@ -1,6 +1,6 @@
 import React ,{Component} from 'react';
-import {Dimensions,Image, ScrollView, StyleSheet, Text, View,ActivityIndicator,AsyncStorage} from 'react-native';
-import {Body, Thumbnail, Card, CardItem, Left, Right, Icon, Button } from 'native-base';
+import {Dimensions,Image, ScrollView, StyleSheet, Text, View,ActivityIndicator,AsyncStorage, TouchableOpacity} from 'react-native';
+import {Body, Thumbnail, Card, CardItem, Left, Right } from 'native-base';
 import Bubble from '../api/Bubble';
 import Price from '../components/Price';
 import { MapView } from 'expo';
@@ -10,6 +10,7 @@ export default class ProductDetailScreen extends Component {
   
   constructor(props){
     super(props);
+    this._isMounted = false;
     this.state = {
       price: null,
       description: null,
@@ -19,17 +20,18 @@ export default class ProductDetailScreen extends Component {
       product:null,
       isLoading: true,
       address:{},
-      favorite:null
+      favorite:[],
+      isFavorite:false
     };
   }
 
-_isMounted = false;
+
 
 static navigationOptions = ({ navigation }) => ({
-  /*title: navigation.getParam('product').title,
+  title: navigation.getParam('product').title,
   headerTitleStyle:{
     flex:1,
-  },*/
+  },
 });
 
 _getProductInfo(){
@@ -38,66 +40,68 @@ _getProductInfo(){
        const product = this.props.navigation.getParam('product');
        price = product.price;
        this._getShop();
+       this._getFavorite();
        this.setState({price, product});
-    },100)
+    },1000)
   }
 }
 
 _getShop = async()=>{
     response = await Bubble._getShopByDealerId(this.state.dealerId);
+    //console.log(response);
     shop = response.response.shop;
     this.setState({shop, address: shop.Address});
     uri = 'https:' + shop.Logo;
     this.setState({logo: uri}); 
+    let isLoading = false;
+    this.setState({isLoading});
 }
 
 _addFavorite = async () => {
-  if(!this.state.favorite){
-    console.log('like');
-    try {
-      await AsyncStorage.setItem('favoriteItem', JSON.stringify(this.state.product._id));
-      await this._getFavorite();
-    } catch (error) {
-      alert(error)
-    } 
-  }else if(this.state.favorite){
-    console.log('unlike');
-    try {
-      console.log(this.state.product._id)
-      await AsyncStorage.removeItem('favoriteItem', JSON.stringify(this.state.product._id));
-      await this._getFavorite();
-    } catch (error) {
-      alert(error)
-    } 
+  const favorites = this.state.favorite;
+  const currentProductId = this.state.product._id
+  // wenn nicht vorhanden, dann hinzufuegen
+  if(!this.state.isFavorite){
+    favorites.push(currentProductId);
+    AsyncStorage.setItem('favorites', JSON.stringify(favorites))
+      .then(json => console.log('success!'))
+      .catch(error => console.log('error!'));
+    this.setState({isFavorite:true});
+  // wenn vorhanden, dann löschen
+  }else{
+    let index = favorites.indexOf(currentProductId);
+    if(index > -1){
+      favorites.splice(index, 1);
+    }
+    AsyncStorage.setItem('favorites', JSON.stringify(favorites))
+      .then(json => console.log('success!'))
+      .catch(error => console.log('error!'));
+      this.setState({isFavorite:false});
   }
 }
 
 _getFavorite = async () => {
-  try {
-  favorite = await AsyncStorage.getItem('favoriteItem') || 'none';
-  console.log(favorite);
-  console.log(JSON.stringify(this.state.product._id));
-  if (favorite !== null && favorite === JSON.stringify(this.state.product._id)) {
-    console.log(true);
-    this.setState({favorite:true});
-  }
-  else{
-    this.setState({favorite:false});
-  }
-  } catch (error) {
-      // Error retrieving data
-  }
-  let isLoading = false;
-  this.setState({isLoading});
+  try{
+    favoritesRaw = await AsyncStorage.getItem('favorites')
+    favorites = JSON.parse(favoritesRaw);
+    this.setState({favorite: favorites});
+    if(this.state.favorite.includes(this.state.product._id)){
+      this.setState({isFavorite:true})
+      return true
+    }
+  }catch(error){
+    if(favoritesRaw === null){
+      this.setState({favorite: []})
+    }
+    console.log('error!')
+  } 
 };
 
 componentDidMount(){
   this._isMounted = true;
   if(this._isMounted){
     this._getProductInfo();
-    this._getFavorite();
   }
-  
 } 
 
 componentWillUnmount(){   
@@ -123,7 +127,7 @@ render() {
                 <Text style={{fontSize:20, fontWeight:'500', color:'#3D3D3D'}}>{this.state.product.title}</Text>
               </Left>
               <Right style={{alignSelf:'flex-start'}}>
-                <Price size={19} marginRight={5} product={this.state.product}></Price>
+                <Price size={18} marginRight={5} product={this.state.product}></Price>
               </Right>
             </CardItem> 
             <CardItem>
@@ -133,15 +137,17 @@ render() {
             </CardItem>
             <CardItem>
                 <Left>
-                    <Thumbnail style={{height:35, width:35}} source={{uri: this.state.logo}} />
+                  <TouchableOpacity onPress={()=> this.props.navigation.navigate('Shop', {shop: this.state.shop})} style={{flexDirection:'row'}}>
+                    <Image style={{height:30, width:50, resizeMode:'contain'}}  source={{uri: this.state.logo}} />
                     <Body>
                         <Text>{this.state.shop.Name}</Text>
                         <Text style={{fontSize: 12}}>{this.state.shop.City}</Text>
                     </Body>
+                  </TouchableOpacity>
                 </Left> 
                 <Right>
                   <FavoriteButton 
-                  favorite={this.state.favorite} 
+                  favorite={this.state.isFavorite} 
                   onPress={()=> this._addFavorite()}>
                   </FavoriteButton>
                 </Right>
@@ -166,15 +172,9 @@ render() {
             "latitude":this.state.address.lat,
             "longitude":this.state.address.lng,
           }}
-          
         />
-          
-        
-        
       </MapView>
            </View>
-            
-            
           </Card>
         </ScrollView> 
       );
@@ -202,5 +202,5 @@ const styles = StyleSheet.create({
       bottom: 0,
       alignItems: 'center',
       justifyContent: 'center'
-    }
+    },
   });

@@ -4,15 +4,17 @@ import HomeScreen from '../screens/HomeScreen';
 import ShopScreen from '../screens/ShopScreen';
 import FavororiteScreen from '../screens/FavororiteScreen';
 import ProductDetailScreen from '../screens/ProductDetailScreen';
-import ProductItem from '../components/ProductItem'
+import ShopDetailScreen from '../screens/ShopDetailScreen';
+import ProductItem from '../components/ProductItem';
+import TabShop from '../components/Tabs/TabShop';
 import {Icon} from 'expo';
 //React Navigation npm install react-navigation
 
 
-const HomeStack = createStackNavigator({
+const HomeStack = createStackNavigator({ 
         Home: HomeScreen,
         Detail:ProductDetailScreen,
-        ProductItem: ProductItem
+        Shop:ShopDetailScreen   
         
     },
     {
@@ -24,6 +26,24 @@ const HomeStack = createStackNavigator({
     }
 )
 
+const ShopStack = createStackNavigator({
+    Shops: ShopScreen,
+    ShopDetail: ShopDetailScreen,
+    ProductDetail: ProductDetailScreen
+},
+{
+    initialRouteName: "Shops"
+},
+{ 
+    defaultNavigationOptions:{
+        headerStyle: {
+            backgroundColor: 'white',
+        },
+}
+})
+
+
+
 
 const tabNavigator = createBottomTabNavigator({
     Home: {
@@ -31,31 +51,34 @@ const tabNavigator = createBottomTabNavigator({
         navigationOptions: { 
             title: 'Entdecken',
             tabBarIcon:({tintColor}) => (
-                <Icon.Entypo name="price-tag" size={24} color={tintColor}/>
+                <Icon.Entypo name="home" size={28} color={tintColor}/>
             )
         }},
     Shops: {
-        screen:createStackNavigator({Shops: ShopScreen}),
+        screen:ShopStack,
         navigationOptions:{ 
             title: 'Shops',
             tabBarIcon:({tintColor}) => (
-                <Icon.Entypo name="shop" size={24} color={tintColor}/>
+                <Icon.Entypo name="shop" size={28} color={tintColor}/>
             ),
         }},
     Favorites: {
         screen: createStackNavigator({Favorites: FavororiteScreen}),  
         navigationOptions:{ 
-            title: 'Favoriten', 
+            title: 'Merkzettel', 
             tabBarIcon:({tintColor}) => ( 
-                <Icon.MaterialIcons name="favorite" size={24} color={tintColor}/>
-            )
+                <Icon.MaterialIcons name="star" size={28} color={tintColor}/>
+            ),
         }}, 
     }, 
     {
         tabBarOptions: {
-            activeTintColor: '#50A1AA',
+            activeTintColor: '#0693E3',
             style:{ 
                 backgroundColor: 'white',
+                borderTopColor: '#E0E0E0',
+                paddingTop:5
+                //height:55,
             },
             animationEnabled: true
         }

@@ -1,16 +1,17 @@
 import React ,{Component} from 'react';
 import {ActivityIndicator ,StyleSheet, View , FlatList,Platform, StatusBar, } from 'react-native';
-import {Body, Container, Header, Content, Title, Item, Input, Icon } from 'native-base';
+import {Container, Header, Content, Item, Input, Icon, Text, Grid, Col } from 'native-base';
 import ProductItem from '../components/ProductItem';
 import Bubble from '../api/Bubble';
-import Expo from 'expo';
+import { Font } from 'expo';
+import { Ionicons, Entypo, MaterialIcons } from '@expo/vector-icons';
 
 export default class HomeScreen extends Component {   
 
 state = {products:[], isLoading: true, dealer:{}}
 
 static navigationOptions = {
-    header: null,
+    header: null
 };
 
 /******************************logic***************************/
@@ -32,6 +33,9 @@ componentDidMount(){
         this._fetchProduct();
       });
       this._fetchProduct();
+      Font.loadAsync({
+        'Caviar': require('../assets/fonts/Pacifico.ttf' ),
+      });
 }
 
 /******************************UI***************************/
@@ -39,20 +43,28 @@ componentDidMount(){
         if(this.state.isLoading){
            return(
                 <View style={styles.loading}>
-                    <ActivityIndicator size='large' color='#50A1AA'/>
+                    <ActivityIndicator size='large' color='#0693E3'/>
                 </View>  
            )
         };
+        //<!--Text style={styles.logo}>Shoppongau</Text-->
       return (
         <Container style={styles.container}> 
-          <Header searchBar rounded style={styles.header}>
-            <Item style={styles.headerItem}>
-              <Icon name="ios-search" />
-            <Input placeholder="Shoppongau durchsuchen" placeholderTextColor='gray' style={{fontSize:16}} /> 
+        <Header style={styles.header} searchBar rounded>
+        <StatusBar
+            barStyle="light-content"
+            backgroundColor="transparent"
+          />
+        <Text style={styles.logo}>Shoppongau</Text> 
+          <Item style={styles.headerItem} >
+            <Icon name="ios-search" />
+            <Input placeholder="Shoppongau durchsuchen..." />
           </Item>
-          </Header> 
-          
-          <Content> 
+          <MaterialIcons name="filter-list" size={32} style={styles.filter} />
+         </Header>
+          <Content>
+            <Grid>
+          <Col style={{width:'100%', justifyContent:'space-around'}}>
             <FlatList contentContainerStyle={styles.content}
                 data={this.state.products}
                 // Key für die list. Momentan name 
@@ -61,14 +73,15 @@ componentDidMount(){
                 numColumns={2}
                 showsVerticalScrollIndicator={false}
                 renderItem={({item}) => (
-              <ProductItem style={{marginRight:10}}
+              <ProductItem 
                 onPress={()=> this.props.navigation.navigate('Detail', {product: item})} product={item}>
               </ProductItem>
                 )}
                 onRefresh={this._refresh} 
                 refreshing={this.state.isLoading}
               />
-          
+              </Col>
+              </Grid>
           </Content>
         </Container>
       );
@@ -82,15 +95,14 @@ componentDidMount(){
       backgroundColor: '#F5F5F5',
       ...Platform.select({ 
           android: {
-              marginTop: StatusBar.currentHeight
+              marginTop: StatusBar.currentHeight 
           }
       }),
     },
     content: {
       flexDirection: 'column',
-      justifyContent: 'space-around',
       alignItems: 'center',
-      marginTop: 10
+      marginTop: 10,
     },
     listEmpty:{
         fontSize: 18,
@@ -114,15 +126,39 @@ componentDidMount(){
     },
     headerItem:{
       position:'absolute',
+      bottom: 10,
+      left: 10,
+      width: '85%',
       height:40,
-      top: Platform.OS === 'ios' ? 30 : 10,
-      width: '95%', 
-      backgroundColor:'#F0EFEF'
+      backgroundColor:'white',
+      marginRight: 10
     },
     header:{
-      height:Platform.OS === 'ios' ? 80 : 60,
-      flexDirection: 'column', 
-      backgroundColor:'white', 
-      alignItems:'center'}
+      height:120,
+      flexDirection: 'row', 
+      backgroundColor:'#0693E3', 
+      alignItems:'flex-end',
+      justifyContent: 'space-around',
+      paddingBottom: 70 
+    },
+    filter:{
+      color:'white', 
+      position:'absolute', 
+      right: 15,
+      bottom: Platform.OS === 'ios' ? 12 : 15
+    },
+    logo:{
+      fontSize: 28,
+      alignSelf:'center', 
+      paddingBottom: Platform.OS === 'ios' ? 60 : 0,
+      marginTop:15,
+      marginBottom:Platform.OS === 'ios' ? 10 : 0,
+      fontFamily: 'Caviar',
+      color: 'white'
+    },
+    statusBarBackground: {
+      height: (Platform.OS === 'ios') ? 22 : 0, //this is just to test if the platform is iOS to give it a height of 18, else, no height (Android apps have their own status bar)
+      backgroundColor: "transparent",
+    }
     
   });

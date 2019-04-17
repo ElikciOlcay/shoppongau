@@ -1,5 +1,5 @@
 import React ,{Component} from 'react';
-import {Image, StyleSheet,View,TouchableOpacity,ActivityIndicator} from 'react-native';
+import {Image, StyleSheet,View,TouchableOpacity,Dimensions} from 'react-native';
 import { Card, CardItem, Text, Body, Left, Thumbnail} from 'native-base';
 import Bubble from '../api/Bubble';
 import Price from '../components/Price';
@@ -7,7 +7,7 @@ import Price from '../components/Price';
 export default class ProductItem extends Component{
 
     state = {
-        dealerId: this.props.product["Created By"],
+        dealerId: this.props.product.shop,
         shop:{}, 
         logo:'',
         isLoading: true
@@ -15,16 +15,14 @@ export default class ProductItem extends Component{
 
  
     _getDealer = async()=>{
-        dealer = await Bubble._getDealer(this.state.dealerId);
-        shopId = dealer.response.Shop;
-        shop = await Bubble._getShop(shopId);
+        shop = await Bubble._getShop(this.state.dealerId);
         this.setState({shop: shop.response});
         this._createLogoUri();
+        this.setState({logo: uri, isLoading:false});
     }
 
     _createLogoUri(){
         uri = 'https:' + this.state.shop.Logo;
-        this.setState({logo: uri, isLoading:false});
     }  
       
     componentDidMount(){
@@ -40,11 +38,11 @@ export default class ProductItem extends Component{
            )
         }
         return(  
-            <TouchableOpacity onPress={onPress}> 
+            <TouchableOpacity onPress={this.props.onPress}> 
                  <Card transparent style={styles.card}>
                     <CardItem>
                         <Left>
-                            <Thumbnail style={{height:35, width:35}} source={{uri: this.state.logo}} />
+                            <Image style={{height:30, width:50, resizeMode:'contain'}} source={{uri: this.state.logo}} />
                             <Body>
                                 <Text>{shop.Name}</Text>
                                 <Text style={{fontSize: 12}}>{shop.City}</Text>
@@ -55,7 +53,7 @@ export default class ProductItem extends Component{
                         <Image source={{uri: product.imageurl}} resizeMode='center' style={{height: 150, width: null, flex: 1}}/>
                     </CardItem> 
                     <CardItem footer style={{flexDirection:'column', alignItems:'flex-start', justifyContent:'space-between'}}>
-                        <Text style={{color: '#686868'}}>{product.title}</Text>
+                        <Text style={{color: 'black', marginBottom:5}}>{product.title}</Text>
                         <Price size={16} marginRight={0} product={product}></Price>
                     </CardItem>
                 </Card>
@@ -66,13 +64,15 @@ export default class ProductItem extends Component{
     
   
 
-
+const {height, width} = Dimensions.get('window');
+const cardWidth = (width -30) /2;
 
 const styles = StyleSheet.create({
     card: {
-        width: 180,
+        width: cardWidth,
         marginLeft: 5,
-        marginRight:5
+        marginRight:5,
+        
 },  
     
     
