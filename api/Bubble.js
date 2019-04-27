@@ -47,6 +47,21 @@ static _getProducts = async ()=>{
   return responseJson;
 }
 
+// get favorites 
+static _getFavorites = async (favorites)=>{
+  let responseJson
+    await fetch("https://shoppongau.bubbleapps.io/version-test/api/1.1/wf/getfavorite/",{
+    method: 'POST',
+    body: JSON.stringify({product: favorites}),
+    headers:{ 
+      'Content-Type': 'application/json',
+    }
+  }).then(res => res.json())
+  .then(response => responseJson = response)
+  .catch(error => console.log('Error', error));
+  return responseJson;
+}
+
 //get all products from shop
 static _getProductsFromShop = async (shopId)=>{
   let responseJson

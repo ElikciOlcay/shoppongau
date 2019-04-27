@@ -1,6 +1,6 @@
 import React ,{Component} from 'react';
 import {Image, StyleSheet,View,TouchableOpacity,Dimensions} from 'react-native';
-import { Card, CardItem, Text, Body, Left, Thumbnail} from 'native-base';
+import { Card, CardItem, Text, Body, Left} from 'native-base';
 import Bubble from '../api/Bubble';
 import Price from '../components/Price';
 

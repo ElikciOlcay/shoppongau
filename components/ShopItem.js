@@ -59,8 +59,6 @@ const styles = StyleSheet.create({
     container: {
         width: cardWidth,
         shadowColor: "#000",
-        
-
     },
 }); 
 

@@ -53,7 +53,7 @@ componentDidMount(){
         <Header style={styles.header} searchBar rounded>
         <StatusBar
             barStyle="light-content"
-            backgroundColor="transparent"
+            backgroundColor="#0693E3"
           />
           <Item style={styles.headerItem} >
             <Icon name="ios-search" />
@@ -89,11 +89,12 @@ componentDidMount(){
     container: {
       flex: 1,
       backgroundColor: '#F5F5F5',
-      ...Platform.select({ 
-          android: {
-              marginTop: StatusBar.currentHeight + 12
-          }
-      }),
+      backgroundColor: '#F5F5F5',
+      ...Platform.select({
+        android: {
+            marginTop: StatusBar.currentHeight
+        }
+    }) 
     },
     content: {
       alignItems: 'center',
@@ -131,12 +132,12 @@ componentDidMount(){
       marginRight: 10
     },
     header:{
-      height:80,
+      height:50,
       flexDirection: 'row', 
       backgroundColor:'white', 
       alignItems:'flex-end',
       justifyContent: 'space-around',
-      paddingBottom: 50,
+      paddingBottom: 60,
       backgroundColor:'#0693E3',
     },
     filter:{
@@ -145,9 +146,6 @@ componentDidMount(){
       right: 15, 
       bottom: Platform.OS === 'ios' ? 12 : 15
     },
-    statusBarBackground: {
-      height: (Platform.OS === 'ios') ? 22 : 0, //this is just to test if the platform is iOS to give it a height of 18, else, no height (Android apps have their own status bar)
-      backgroundColor: "white",
-    }
+    
     
   });

@@ -32,10 +32,10 @@ static navigationOptions = ({ navigation }) => ({
   headerTitleStyle:{
     flex:1,
   },
-});
-
+}); 
+ 
 _getProductInfo(){
- if(this._isMounted){
+ if(this._isMounted){ 
     setTimeout(()=>{
        const product = this.props.navigation.getParam('product');
        price = product.price;

@@ -42,6 +42,11 @@ const ShopStack = createStackNavigator({
 }
 })
 
+const FavoriteStack = createStackNavigator({
+    Favorites: FavororiteScreen,
+    ProductDetail: ProductDetailScreen
+})
+
 
 
 
@@ -63,7 +68,7 @@ const tabNavigator = createBottomTabNavigator({
             ),
         }},
     Favorites: {
-        screen: createStackNavigator({Favorites: FavororiteScreen}),  
+        screen: FavoriteStack,  
         navigationOptions:{ 
             title: 'Merkzettel', 
             tabBarIcon:({tintColor}) => ( 

@@ -53,7 +53,7 @@ componentDidMount(){
         <Header style={styles.header} searchBar rounded>
         <StatusBar
             barStyle="light-content"
-            backgroundColor="transparent"
+            backgroundColor="#0693E3"
           />
         <Text style={styles.logo}>Shoppongau</Text> 
           <Item style={styles.headerItem} >
@@ -93,11 +93,11 @@ componentDidMount(){
     container: {
       flex: 1,
       backgroundColor: '#F5F5F5',
-      ...Platform.select({ 
-          android: {
-              marginTop: StatusBar.currentHeight 
-          }
-      }),
+      ...Platform.select({
+        android: {
+            marginTop: StatusBar.currentHeight
+        }
+    }) 
     },
     content: {
       flexDirection: 'column',
