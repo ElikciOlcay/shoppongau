@@ -33,11 +33,12 @@ static _postData = async (title, image)=>{
 }
 
 //get all products for the Startpage
-static _getProducts = async ()=>{
+static _getProducts = async (sortValue, category)=>{
+  console.log(sortValue)
   let responseJson
     await fetch("https://shoppongau.bubbleapps.io/version-test/api/1.1/wf/getproducts/",{
     method: 'POST',
-    body: JSON.stringify({sort: false}),
+    body: JSON.stringify({}),
     headers:{ 
       'Content-Type': 'application/json',
     }
@@ -118,6 +119,19 @@ static _getDealer = async (dealerId) => {
       alert('Sie haben keine Internetverbindung');  
     }
     return responseJson;
+}
+
+static _getCategory = async () => {
+  try{
+    const response = await fetch('https://shoppongau.bubbleapps.io/version-test/api/1.1/obj/category/' , {
+      method: 'get',
+      dataType: 'json'
+    });
+    responseJson = await response.json();
+  }catch(error){
+    alert('Sie haben keine Internetverbindung');  
+  }
+  return responseJson;
 }
 
 static _getShop = async (shopId) => {
