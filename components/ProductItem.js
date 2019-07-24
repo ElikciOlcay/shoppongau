@@ -1,65 +1,97 @@
 import React ,{Component} from 'react';
-import {Image, StyleSheet,View,TouchableOpacity,Dimensions} from 'react-native';
-import { Card, CardItem, Text, Body, Left} from 'native-base';
+import {Image, StyleSheet,View,TouchableOpacity,Dimensions, Text} from 'react-native';
+import { Card, CardItem, Body, Left} from 'native-base';
 import Bubble from '../api/Bubble';
 import Price from '../components/Price';
+import { LinearGradient } from 'expo'
 
 export default class ProductItem extends Component{
 
     state = {
         dealerId: this.props.product.shop,
-        shop:{}, 
-        logo:'',
-        isLoading: true
+        shop:'',
+        shopName:'', 
+        product:'',
+        image:'',
+        uri: '',
+        isLoading: true,
+        isAngebot: false,
+        colors: [],
     };
+    
 
- 
-    _getDealer = async()=>{
-        shop = await Bubble._getShop(this.state.dealerId);
-        this.setState({shop: shop.response});
-        this._createLogoUri();
-        this.setState({logo: uri, isLoading:false});
+    componentDidMount(){
+        this.setState({product: this.props.product});
+        this._getDealer();
+        this._getIsAngebot();
     }
 
-    _createLogoUri(){
-        uri = 'https:' + this.state.shop.Logo;
+    _getIsAngebot(){
+        let angebot = this.props.product.angebot;
+        if(angebot){
+            this.setState({isAngebot:true});
+            this._getGradientColor();
+        }
+    }
+ 
+    _getDealer = async()=>{
+        try{
+            shop = await Bubble._getShop(this.state.dealerId);
+            this.setState({shopName: shop.response.name});
+            this.setState({image: this.state.product.images[0]});
+        }
+        catch(e){
+            console.log(e);
+        }
+        this._createImageUri();
+    } 
+
+    _createImageUri(){
+        uri = 'https:' + this.state.image;
+        this.setState({uri});
+        this.setState({isLoading:false});
     }  
       
-    componentDidMount(){
-        this._getDealer();
+   _getGradientColor = async ()=> {
+       let responseJson = await Bubble._getGradientColor(this.props.product.Angebot_Color);
+       let colors = [];
+       colors = responseJson.response.color.code;
+       this.setState({colors});
     }
 
     render(){
         const{product, onPress} = this.props;
-        const{shop} = this.state;
+        const{shopName} = this.state;
+        const{uri} = this.state;
         if(this.state.isLoading){
            return(
             <View></View>  
            )
         }
-        return(  
-            <TouchableOpacity onPress={this.props.onPress}> 
-                 <Card transparent style={styles.card}>
-                    <CardItem>
-                        <Left>
-                            <Image style={{height:30, width:50, resizeMode:'contain'}} source={{uri: this.state.logo}} />
-                            <Body>
-                                <Text>{shop.Name}</Text>
-                                <Text style={{fontSize: 12}}>{shop.City}</Text>
-                            </Body>
-                        </Left> 
-                    </CardItem>
-                    <CardItem cardBody>
-                        <Image source={{uri: product.imageurl}} resizeMode='center' style={{height: 150, width: null, flex: 1}}/>
-                    </CardItem> 
-                    <CardItem footer style={{flexDirection:'column', alignItems:'flex-start', justifyContent:'space-between'}}>
-                        <Text style={{color: 'black', marginBottom:5}}>{product.title}</Text>
-                        <Price size={16} marginRight={0} product={product}></Price>
-                    </CardItem>
-                </Card>
-            </TouchableOpacity> 
-            );
-        }  
+        if(!this.state.isAngebot){
+            return(  
+                <TouchableOpacity onPress={this.props.onPress}> 
+                     <Card transparent style={styles.card}>
+                        <CardItem cardBody>
+                            <Image source={{uri: uri}} resizeMode='cover' style={{height: 250, width: null, flex: 1}}/>
+                        </CardItem> 
+                        <CardItem footer style={{flexDirection:'column', alignItems:'flex-start', justifyContent:'space-between'}}>
+                            <Text style={{color: 'black', marginBottom:5}}>{product.title}</Text>
+                            <Price size={18} marginRight={0} product={product}></Price>
+                        </CardItem>
+                    </Card>
+                </TouchableOpacity> 
+                );
+        }else{
+            return(
+                <View>
+                    <LinearGradient colors={this.state.colors} style={styles.gardientCard}>
+                        <Text style={styles.angebotText}>{product.Angebot_Text}</Text>
+                    </LinearGradient>
+                </View>
+               )
+        }
+      }  
     }
     
   
@@ -72,8 +104,18 @@ const styles = StyleSheet.create({
         width: cardWidth,
         marginLeft: 5,
         marginRight:5,
-        
-},  
+    },
+    gardientCard: {
+        width: cardWidth,
+        height:300,
+        marginLeft: 5,
+        marginRight:5,
+    },
+    angebotText:{
+        fontSize: 20,
+        color: '#fff',
+        fontWeight: 'bold'
+    }
     
     
 }); 

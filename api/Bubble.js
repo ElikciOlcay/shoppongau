@@ -4,6 +4,7 @@ export default class Bubble{
 
 static token;
 
+/*****Login******/
 static _login = async (email, pw)=>{
     await fetch('https://reactnative.bubbleapps.io/version-test/api/1.1/wf/login/', {
         method: 'POST', // or 'PUT'
@@ -17,6 +18,7 @@ static _login = async (email, pw)=>{
       console.log("Email:" + email + "PW:" + pw + "Token:" + this.token);  
     }
 
+/*****Add Product******/
 static _postData = async (title, image)=>{
     await this._retrieveData();
     await fetch('https://reactnative.bubbleapps.io/version-test/api/1.1/wf/addProduct/', {
@@ -34,9 +36,8 @@ static _postData = async (title, image)=>{
 
 //get all products for the Startpage
 static _getProducts = async (sortValue, category)=>{
-  console.log(sortValue)
-  let responseJson
-    await fetch("https://shoppongau.bubbleapps.io/version-test/api/1.1/wf/getproducts/",{
+  let responseJson;
+    await fetch("https://shoppongau.at/api/1.1/wf/getproducts/",{
     method: 'POST',
     body: JSON.stringify({}),
     headers:{ 
@@ -46,6 +47,20 @@ static _getProducts = async (sortValue, category)=>{
   .then(response => responseJson = response)
   .catch(error => console.log('Error', error));
   return responseJson;
+}
+
+static _getGradientColor = async (id) => {
+  let responseJson;
+    await fetch("https://shoppongau.at/api/1.1/wf/getgradientcolor/",{
+      method: 'POST',
+      body: JSON.stringify({id}),
+      headers:{
+        'Content-Type': 'application/json',
+      }
+    }).then(res => res.json())
+    .then(response => responseJson = response)
+    .catch(error => console.log('Error', error));
+    return responseJson;
 }
 
 // get favorites 
@@ -136,7 +151,7 @@ static _getCategory = async () => {
 
 static _getShop = async (shopId) => {
   try{
-    const response = await fetch('https://shoppongau.bubbleapps.io/version-test/api/1.1/obj/shop/' + shopId, {
+    const response = await fetch('https://shoppongau.at/api/1.1/obj/shop/' + shopId, {
       method: 'get',
       dataType: 'json'
     });

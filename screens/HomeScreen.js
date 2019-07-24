@@ -55,9 +55,8 @@ searchFilter = text => {
 
 _fetchProduct = async ()=>{
  let category = this.state.category;
- console.log(category);
  let responseJson = await Bubble._getProducts(this.state.selectedValue, category);
-  // state als funktion weil es asyn ist
+  // state als funktion weil es async ist
   this.arrayholder = responseJson.response.products;
   this.setState({products: responseJson.response.products, isLoading:false});
 }

@@ -21,7 +21,8 @@ export default class ProductDetailScreen extends Component {
       isLoading: true,
       address:{},
       favorite:[],
-      isFavorite:false
+      isFavorite:false,
+      uri:''
     };
   }
 
@@ -33,23 +34,26 @@ static navigationOptions = ({ navigation }) => ({
     flex:1,
   },
 }); 
+
  
 _getProductInfo(){
  if(this._isMounted){ 
     setTimeout(()=>{
        const product = this.props.navigation.getParam('product');
-       price = product.price;
+       let price = product.price;
+       let image = product.images[0];
+       let uri = 'http://' + image;
        this._getShop();
        this._getFavorite();
-       this.setState({price, product});
+       this.setState({price, product, image, uri});
     },1000)
   }
 }
 
 _getShop = async()=>{
     response = await Bubble._getShopByDealerId(this.state.dealerId);
-    //console.log(response);
     shop = response.response.shop;
+    console.log(shop);
     this.setState({shop, address: shop.Address});
     uri = 'https:' + shop.Logo;
     this.setState({logo: uri}); 
@@ -120,7 +124,7 @@ render() {
         <ScrollView contentContainerStyle={styles.container}>
           <Card transparent>
             <CardItem style={{justifyContent:'center'}}>
-              <Image resizeMode='contain' source={{uri: this.state.product.imageurl}} style={styles.image}></Image>
+              <Image resizeMode='cover' source={{uri: this.state.uri}} style={styles.image}></Image>
             </CardItem>
             <CardItem style={{borderTopWidth:1, borderTopColor:'#EBEBEB', borderStyle:'solid'}}>
               <Left style={{flexDirection:'column'}}>
@@ -160,8 +164,8 @@ render() {
           alignSelf: 'center'
         }}
         initialRegion={{
-          latitude: this.state.address.lat,
-          longitude: this.state.address.lng,
+          latitude: '',
+          longitude: '',
           latitudeDelta: 0.001,
           longitudeDelta: 0.001,
           scrollEnabled: false  
@@ -169,8 +173,8 @@ render() {
        
          <MapView.Marker
           coordinate={{
-            "latitude":this.state.address.lat,
-            "longitude":this.state.address.lng,
+            "latitude":1,
+            "longitude":1
           }}
         />
       </MapView>
