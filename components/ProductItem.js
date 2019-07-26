@@ -13,7 +13,7 @@ export default class ProductItem extends Component{
         shopName:'', 
         product:'',
         image:'',
-        uri: '',
+        uri: 'https://d1muf25xaso8hp.cloudfront.net/https%3A%2F%2Fs3.amazonaws.com%2Fappforest_uf%2Ff1564139480827x705524153176210800%2Fimages.png?w=192&h=300&auto=compress&fit=max',
         isLoading: false,
         isAngebot: false,
         colors: ['#F2F0F0', '#F2F0F0'],
@@ -49,7 +49,6 @@ export default class ProductItem extends Component{
     _createImageUri(){
         uri = 'https:' + this.state.image;
         this.setState({uri});
-        //this.setState({isLoading:false});
     }  
       
    _getGradientColor = async ()=> {

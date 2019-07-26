@@ -57,14 +57,30 @@ searchFilter = text => {
   this.setState({ products: newData });  
 };
 
+//***********************load products*******************************
+
 _fetchProduct = async (loadmore)=>{
  //this.setState({isLoading:true});
  let selectedCategory = this.state.selectedCategory;
- let selectedValue = this.state.selectedValue;
+ let sort = this.state.selectedValue;
  var cursor = this.state.cursor;
+ /* Sort value for API 
+    sort 1 = random 
+    sort 2 = price desc
+    sort 3 = price asc
+    sort 4 = category + desc
+    sort 5 = category + asc
+ */
+ if(this.state.searchCategory == true && sort == 2){
+   sort = 4
+ }else if(this.state.searchCategory == true && sort == 3){
+   sort = 5
+ }else if(this.state.searchCategory == true && sort == 1){
+   sort = 6
+ }
  if(loadmore && this.state.remainingZero == false){
    this.setState({isLoading:true});
-   cursor = this.state.cursor + 5;
+   cursor = this.state.cursor + 20;
    this.setState({cursor});
  }
  if(this.state.remainingZero == true){
@@ -72,12 +88,8 @@ _fetchProduct = async (loadmore)=>{
    cursor = 0;
    this.setState({cursor, remainingZero:false});
  }
- let responseJson = await Bubble._getProducts(selectedValue, selectedCategory, cursor);
-  // state als funktion weil es async ist
-  //this.arrayholder = responseJson.response;
-  console.log(responseJson.response.remaining);
+ let responseJson = await Bubble._getProducts(sort, selectedCategory, cursor);
   if(responseJson.response.remaining == 0){
-    console.log("Remainin True");
     this.setState({remainingZero:true});
   }
   this.setState({products: responseJson.response.results, isLoading:false});
@@ -92,6 +104,13 @@ _fetchCategory = async()=>{
  }
   this.setState({category});
   this._fetchProduct();
+}
+
+_fetchCategoryByName = async(name)=>{
+  let responseJson = await Bubble._getCategoryByName(name);
+  let responseArray = responseJson.response.results
+  let categoryId = responseArray[0]._id;
+  this.setState({selectedCategory: categoryId, searchCategory: true});
 }
 
 _refresh = ()=> {
@@ -127,8 +146,8 @@ _fetchFilteredData = () => {
 }
 
 _setCategory = (text)=> {
-  let selectedCategory = text;
-  this.setState({selectedCategory, searchCategory: true});
+  console.log(text);
+  this._fetchCategoryByName(text);
 }
 
 

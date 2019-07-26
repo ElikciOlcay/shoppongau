@@ -35,10 +35,30 @@ static _postData = async (title, image)=>{
 }
 
 //get all products for the Startpage
+/* Sort value for API 
+    sort 1 = random 
+    sort 2 = price desc
+    sort 3 = price asc
+    sort 4 = category + desc
+    sort 5 = category + asc
+    sort 6 = category
+ */
 static _getProducts = async (sort, category, cursor)=>{
+  let url;
+  console.log(sort);
+  console.log(category);
   let responseJson;
-  console.log("cursor " + cursor);
-  let url = `http://shoppongau.at/api/1.1/obj/product?limit=5&cursor=${cursor}`;
+  switch(sort){
+    case 1: url = `http://shoppongau.at/api/1.1/obj/product?constraints=[{"key": "active", "constraint_type":"equals", "value": "true"}]&limit=20&cursor=${cursor}`;
+    break;
+    case 2: url = `http://shoppongau.at/api/1.1/obj/product?sort_field=preis&descending=true&constraints=[{"key": "active", "constraint_type":"equals", "value": "true"}]&limit=20&cursor=${cursor}`;
+    break;
+    case 3: url = `http://shoppongau.at/api/1.1/obj/product?sort_field=preis&descending=false&constraints=[{"key": "active", "constraint_type":"equals", "value": "true"}]&limit=20&cursor=${cursor}`;
+    break;
+    case 4: url = `http://shoppongau.at/api/1.1/obj/product?sort_field=preis&descending=true&constraints=[{"key": "active", "constraint_type":"equals", "value": "true"},{"key": "category", "constraint_type":"equals", "value": "${category}"}]&limit=20&cursor=${cursor}`;
+    break;
+    case 5: url = `http://shoppongau.at/api/1.1/obj/product?sort_field=preis&descending=false&constraints=[{"key": "active", "constraint_type":"equals", "value": "true"},{"key": "category", "constraint_type":"equals", "value": "${category}"}]&limit=20&cursor=${cursor}`;
+  }
   await fetch(url,{
     method: 'GET',
     headers:{  
@@ -150,6 +170,27 @@ static _getCategory = async () => {
   }
   return responseJson;
 }
+
+static _getCategoryByName = async (name) => {
+  let url = `https://www.shoppongau.at/api/1.1/obj/category/?constraints=[{
+    "key": "value", 
+    "constraint_type":"equals", 
+    "value": "${name}"
+  }
+  ]`;
+  try{
+    const response = await fetch(url , {  
+      method: 'get',
+      dataType: 'json'
+    });
+    responseJson = await response.json();
+  }catch(error){
+    alert('Sie haben keine Internetverbindung');  
+  }
+  return responseJson;
+}
+
+
 
 static _getShop = async (shopId) => {
   try{
