@@ -1,6 +1,6 @@
 import React ,{Component} from 'react';
 import {ActivityIndicator ,StyleSheet, View , FlatList,Platform, StatusBar, Picker } from 'react-native';
-import {Container, Header, Content, Item, Input, Icon, Text, Grid, Col } from 'native-base';
+import {Button,Container, Header, Content, Item, Input, Icon, Text, Grid, Col } from 'native-base';
 import ProductItem from '../components/ProductItem';
 import Bubble from '../api/Bubble';
 import { Font } from 'expo';
@@ -28,6 +28,10 @@ state = {
   selectedValue:1,
   searchValue:null,
   category:[],
+  selectedCategory:'',
+  searchCategory: false,
+  cursor: 0,
+  remainingZero:false
 }
 
 static navigationOptions = {
@@ -40,7 +44,7 @@ arrayholder = [];
 /******************************logic***************************/
 
 setModalVisible(visible) {
-  this.setState({modalVisible: visible});
+  this.setState({selectedCategory: '',modalVisible: visible, searchCategory: false});
 }
 
 searchFilter = text => {    
@@ -53,19 +57,38 @@ searchFilter = text => {
   this.setState({ products: newData });  
 };
 
-_fetchProduct = async ()=>{
- let category = this.state.category;
- let responseJson = await Bubble._getProducts(this.state.selectedValue, category);
+_fetchProduct = async (loadmore)=>{
+ //this.setState({isLoading:true});
+ let selectedCategory = this.state.selectedCategory;
+ let selectedValue = this.state.selectedValue;
+ var cursor = this.state.cursor;
+ if(loadmore && this.state.remainingZero == false){
+   this.setState({isLoading:true});
+   cursor = this.state.cursor + 5;
+   this.setState({cursor});
+ }
+ if(this.state.remainingZero == true){
+   console.log("Remaining Zero");
+   cursor = 0;
+   this.setState({cursor, remainingZero:false});
+ }
+ let responseJson = await Bubble._getProducts(selectedValue, selectedCategory, cursor);
   // state als funktion weil es async ist
-  this.arrayholder = responseJson.response.products;
-  this.setState({products: responseJson.response.products, isLoading:false});
+  //this.arrayholder = responseJson.response;
+  console.log(responseJson.response.remaining);
+  if(responseJson.response.remaining == 0){
+    console.log("Remainin True");
+    this.setState({remainingZero:true});
+  }
+  this.setState({products: responseJson.response.results, isLoading:false});
 }
 
 _fetchCategory = async()=>{
   let responseJson = await Bubble._getCategory();
+  let responseArray = responseJson.response.results
   let category = [];
-  for(let i=0; i<responseJson.length; i++ ){
-    category.push(category[i].value);
+  for(let i=0; i<responseArray.length; i++ ){
+    category.push(responseArray[i]); 
  }
   this.setState({category});
   this._fetchProduct();
@@ -91,11 +114,12 @@ _setFilter = (filter) => {
   this.setState({ filter });
   let selectedValue = this.state.filter.find(e => e.selected == true);
   let value = selectedValue.value;
+  console.log(value);
   this.setState({selectedValue: value});
 }
 
 _fetchFilteredData = () => {
-  this.setState({modalVisible:false});
+  this.setState({cursor:0,modalVisible:false});
   //wait until modal is closed
   setTimeout(() => {
     this.setState({isLoading:true});
@@ -103,10 +127,8 @@ _fetchFilteredData = () => {
 }
 
 _setCategory = (text)=> {
-  let selectedCategory = [];
-  selectedCategory.push(text);
-  this.setState({category: selectedCategory});
-  this._fetchProduct();
+  let selectedCategory = text;
+  this.setState({selectedCategory, searchCategory: true});
 }
 
 
@@ -202,11 +224,14 @@ _setCategory = (text)=> {
                 onPress={()=> this.props.navigation.navigate('Detail', {product: item})} product={item}>
               </ProductItem>
                 )}
-                onRefresh={this._refresh} 
+                onRefresh={this._refresh}
                 refreshing={this.state.isLoading}
               />
-              </Col>
+              </Col> 
               </Grid>
+              <Button full info onPress={() => this._fetchProduct(true)} style={styles.loadMore}>
+                <Text style={{}}>mehr</Text>
+              </Button>
           </Content>
         </Container>
       );
@@ -273,7 +298,7 @@ _setCategory = (text)=> {
       bottom: Platform.OS === 'ios' ? 12 : 15
     },
     logo:{
-      fontSize: 28,
+      fontSize: 30,
       alignSelf:'center', 
       paddingBottom: Platform.OS === 'ios' ? 60 : 0,
       marginTop:15,
@@ -284,6 +309,13 @@ _setCategory = (text)=> {
     statusBarBackground: {
       height: (Platform.OS === 'ios') ? 22 : 0, //this is just to test if the platform is iOS to give it a height of 18, else, no height (Android apps have their own status bar)
       backgroundColor: "transparent",
+    },
+    loadMore:{
+      marginTop: 20,
+      marginBottom: 20,
+      alignSelf: 'center',
+      width: 300
+      
     }
     
   });

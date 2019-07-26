@@ -9,14 +9,14 @@ export default class ProductItem extends Component{
 
     state = {
         dealerId: this.props.product.shop,
-        shop:'',
+        shop:'', 
         shopName:'', 
         product:'',
         image:'',
         uri: '',
-        isLoading: true,
+        isLoading: false,
         isAngebot: false,
-        colors: [],
+        colors: ['#F2F0F0', '#F2F0F0'],
     };
     
 
@@ -49,7 +49,7 @@ export default class ProductItem extends Component{
     _createImageUri(){
         uri = 'https:' + this.state.image;
         this.setState({uri});
-        this.setState({isLoading:false});
+        //this.setState({isLoading:false});
     }  
       
    _getGradientColor = async ()=> {
@@ -87,6 +87,7 @@ export default class ProductItem extends Component{
                 <View>
                     <LinearGradient colors={this.state.colors} style={styles.gardientCard}>
                         <Text style={styles.angebotText}>{product.Angebot_Text}</Text>
+                        <Text style={styles.shopName}>{this.state.shopName}</Text>
                     </LinearGradient>
                 </View>
                )
@@ -106,16 +107,26 @@ const styles = StyleSheet.create({
         marginRight:5,
     },
     gardientCard: {
+        justifyContent: 'center',
+        alignItems: 'center',
         width: cardWidth,
         height:300,
         marginLeft: 5,
         marginRight:5,
     },
     angebotText:{
-        fontSize: 20,
+        textAlign: 'center',
+        fontSize: 40, 
         color: '#fff',
         fontWeight: 'bold'
+    },
+    shopName:{
+        position: 'absolute',
+        bottom: 4,
+        fontSize:18,
+        color: '#fff',
     }
+
     
     
 }); 

@@ -35,17 +35,19 @@ static _postData = async (title, image)=>{
 }
 
 //get all products for the Startpage
-static _getProducts = async (sortValue, category)=>{
+static _getProducts = async (sort, category, cursor)=>{
   let responseJson;
-    await fetch("https://shoppongau.at/api/1.1/wf/getproducts/",{
-    method: 'POST',
-    body: JSON.stringify({}),
-    headers:{ 
+  console.log("cursor " + cursor);
+  let url = `http://shoppongau.at/api/1.1/obj/product?limit=5&cursor=${cursor}`;
+  await fetch(url,{
+    method: 'GET',
+    headers:{  
       'Content-Type': 'application/json',
     }
   }).then(res => res.json())
   .then(response => responseJson = response)
   .catch(error => console.log('Error', error));
+  //console.log(responseJson);
   return responseJson;
 }
 
@@ -138,7 +140,7 @@ static _getDealer = async (dealerId) => {
 
 static _getCategory = async () => {
   try{
-    const response = await fetch('https://shoppongau.bubbleapps.io/version-test/api/1.1/obj/category/' , {
+    const response = await fetch('https://www.shoppongau.at/api/1.1/obj/category/' , {
       method: 'get',
       dataType: 'json'
     });
